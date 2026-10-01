@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy | WaveScope</title>
+  <link rel="alternate" hreflang="zh-Hant-TW" href="../privacy.html">
+  <link rel="icon" href="../assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">
+        <img src="../assets/logo.svg" alt="" width="28" height="28">
+        WaveScope
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="./">Home</a>
+        <a href="./#contact">Contact</a>
+        <a class="lang" href="../privacy.html" hreflang="zh-Hant-TW" lang="zh-Hant-TW">中文</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="legal">
+    <div class="wrap">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Effective date: {{EFFECTIVE_DATE}}</p>
+
+      <p>This policy explains how {{COMPANY_NAME_EN}} ("we", "us") collects, uses, stores and deletes data when providing WaveScope (the "Service"). The Service is a marketing analytics tool used internally by our team and is not open for public sign-up. If this English version differs from the Traditional Chinese version, the Traditional Chinese version prevails.</p>
+
+      <h2>1. Data we collect</h2>
+      <table>
+        <thead><tr><th>Source</th><th>Data</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Public Instagram business data (Meta Business Discovery API)</td>
+            <td>Public username, follower count and media count of Instagram professional (business or creator) accounts, and the URL, publish time, like count, comment count and Reels view count of their public posts.</td>
+          </tr>
+          <tr>
+            <td>Creator-authorized data (Instagram Insights)</td>
+            <td>Collected only after a creator opens our authorization link and grants consent: post insights such as reach, views, saves and shares, and aggregated follower demographics by age, gender and location. Demographics are aggregates and never identify individual followers.</td>
+          </tr>
+          <tr>
+            <td>Public hashtag posts (Meta Hashtag Search API)</td>
+            <td>URL, caption, publish time, like count and comment count of public posts using specific hashtags. This API does not return the author's username, and we do not collect it by other means.</td>
+          </tr>
+          <tr>
+            <td>Manual input by our team</td>
+            <td>Collaboration fees, agreed deliverables, quotes, and figures shared with us by creators.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>We only collect data through official Meta APIs. We do not use scrapers or any method that circumvents platform protections. We never collect or store creators' Instagram passwords.</p>
+
+      <h2>2. How we use data</h2>
+      <p>Data is used only to evaluate the performance of creator collaborations, compare and select creators, choose content worth promoting, and observe changes in topic volume. We do <strong>not</strong> sell, rent or transfer any data obtained from Meta platforms, and we do not use it for building ad audiences, profiling individuals, or any purpose unrelated to the above.</p>
+
+      <h2>3. Storage and security</h2>
+      <ul>
+        <li>Access tokens granted by creators are stored encrypted and used only to retrieve data within the scope the creator authorized.</li>
+        <li>The Service is accessed only over HTTPS; passwords are stored as hashes, and access is limited to authorized team members.</li>
+        <li>Public hashtag posts are kept for 180 days; captions are cleared after 90 days.</li>
+        <li>For creator accounts we stop observing, regular (non-collaboration) post data is deleted one year after observation ends.</li>
+        <li>Performance data of collaboration posts is kept with the campaign record for reporting and future evaluation.</li>
+      </ul>
+
+      <h2>4. Revoking authorization and deleting data</h2>
+      <p>Creators who have authorized the Service can revoke authorization and request deletion at any time, in either of these ways:</p>
+      <ol>
+        <li>Remove the Service under "Settings → Apps and websites" in Instagram or Facebook. When we receive Meta's data deletion request, we delete your access token, Insights data and follower demographics.</li>
+        <li>Email <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a> with your Instagram username. We will complete the deletion and reply within 30 days after verifying your identity.</li>
+      </ol>
+      <p>After authorization is revoked, we may still keep public data obtained through public APIs (such as like counts on public posts), since anyone can view it. You may also email us to have that data deleted.</p>
+
+      <h2>5. Third parties</h2>
+      <p>Our data source is Meta Platforms, Inc.; see the <a href="https://privacycenter.instagram.com/policy" rel="noopener">Instagram Privacy Policy</a> for how Meta handles data. We store data on a cloud host and do not share it with any other third party except as required by law.</p>
+
+      <h2>6. Changes to this policy</h2>
+      <p>When this policy changes, we will update the effective date on this page. For material changes, we will notify creators who have authorized the Service.</p>
+
+      <h2>7. Contact</h2>
+      <p>{{COMPANY_NAME_EN}}<br>Address: {{ADDRESS_EN}}<br>Email: <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">© 2026 {{COMPANY_NAME_EN}}. Instagram is a trademark of Meta Platforms, Inc. WaveScope is not affiliated with Meta.</div>
+  </footer>
+</body>
+</html>

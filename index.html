@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>聲流 WaveScope｜IG 創作者合作成效與議題聲量監測</title>
+  <meta name="description" content="WaveScope 用 Meta 官方 API 追蹤 IG 創作者合作貼文的成效、觀察創作者帳號，並監測議題聲量，取代人工截圖整理結案報表。">
+  <link rel="alternate" hreflang="zh-Hant-TW" href="./">
+  <link rel="alternate" hreflang="en" href="./en/">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./">
+        <img src="assets/logo.svg" alt="" width="28" height="28">
+        聲流 WaveScope
+      </a>
+      <nav class="nav" aria-label="主選單">
+        <a href="#features">功能</a>
+        <a href="#principles">資料原則</a>
+        <a href="#status">進度</a>
+        <a href="#contact">聯絡我們</a>
+        <a class="lang" href="./en/" hreflang="en" lang="en">English</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <span class="eyebrow">IG 創作者合作 × 議題聲量</span>
+          <h1>合作成效不必再靠截圖整理</h1>
+          <p class="lead">WaveScope 自動追蹤每一則合作貼文的觀看與互動，在固定的評估節點公平比較創作者，並看見議題聲量怎麼變化。每個數字都附上來源、定義與擷取時間。</p>
+          <a class="btn" href="#contact">聯絡我們</a>
+          <a class="btn ghost" href="#features">看看功能</a>
+        </div>
+        <figure class="chart-card" aria-label="示意圖：合作貼文與基準貼文的累積互動，以及評估節點">
+          <div class="label">示意：合作貼文 vs. 同帳號基準貼文（累積互動）</div>
+          <svg viewBox="0 0 400 200" role="img" aria-hidden="true">
+            <g class="grid" stroke-width="1">
+              <line x1="30" y1="170" x2="390" y2="170"/>
+              <line x1="30" y1="123" x2="390" y2="123" opacity=".5"/>
+              <line x1="30" y1="77" x2="390" y2="77" opacity=".5"/>
+              <line x1="30" y1="30" x2="390" y2="30" opacity=".5"/>
+            </g>
+            <path class="area" d="M30.0,170.0 L36.4,150.8 L42.9,134.3 L49.3,120.2 L55.7,108.2 L62.1,97.9 L68.6,89.1 L75.0,81.5 L81.4,75.1 L87.9,69.6 L94.3,64.9 L100.7,60.8 L107.1,57.4 L113.6,54.4 L120.0,51.9 L126.4,49.8 L132.9,47.9 L139.3,46.3 L145.7,45.0 L152.1,43.8 L158.6,42.8 L165.0,42.0 L171.4,41.3 L177.9,40.7 L184.3,40.1 L190.7,39.7 L197.1,39.3 L203.6,39.0 L210.0,38.7 L222.9,38.2 L235.7,37.9 L255.0,37.6 L274.3,37.4 L300.0,37.2 L332.1,37.1 L364.3,37.0 L390.0,37.0 L390,170 Z"/>
+            <path class="base" fill="none" stroke-width="2" d="M30.0,170.0 L36.4,159.8 L42.9,150.8 L49.3,142.9 L55.7,135.8 L62.1,129.7 L68.6,124.2 L75.0,119.4 L81.4,115.1 L87.9,111.4 L94.3,108.1 L100.7,105.1 L107.1,102.6 L113.6,100.3 L120.0,98.3 L126.4,96.5 L132.9,94.9 L139.3,93.6 L145.7,92.3 L152.1,91.3 L158.6,90.3 L165.0,89.5 L171.4,88.7 L184.3,87.5 L197.1,86.6 L210.0,85.8 L229.3,85.0 L248.6,84.4 L274.3,84.0 L300.0,83.7 L332.1,83.4 L364.3,83.3 L390.0,83.3"/>
+            <path class="curve" fill="none" stroke-width="2.5" stroke-linecap="round" d="M30.0,170.0 L36.4,150.8 L42.9,134.3 L49.3,120.2 L55.7,108.2 L62.1,97.9 L68.6,89.1 L75.0,81.5 L81.4,75.1 L87.9,69.6 L94.3,64.9 L100.7,60.8 L107.1,57.4 L113.6,54.4 L120.0,51.9 L126.4,49.8 L132.9,47.9 L139.3,46.3 L145.7,45.0 L152.1,43.8 L158.6,42.8 L165.0,42.0 L171.4,41.3 L177.9,40.7 L184.3,40.1 L190.7,39.7 L197.1,39.3 L203.6,39.0 L210.0,38.7 L222.9,38.2 L235.7,37.9 L255.0,37.6 L274.3,37.4 L300.0,37.2 L332.1,37.1 L364.3,37.0 L390.0,37.0"/>
+            <g>
+              <circle class="node" cx="42.9" cy="134.3" r="4.5"/>
+              <circle class="node" cx="68.6" cy="89.1" r="4.5"/>
+              <circle class="node" cx="120.0" cy="51.9" r="4.5"/>
+              <circle class="node" cx="210.0" cy="38.7" r="4.5"/>
+              <circle class="node" cx="300.0" cy="37.2" r="4.5"/>
+              <circle class="node" cx="390.0" cy="37.0" r="4.5"/>
+            </g>
+            <g class="axis" text-anchor="middle">
+              <text x="42.9" y="188">D1</text>
+              <text x="68.6" y="188">D3</text>
+              <text x="120" y="188">D7</text>
+              <text x="210" y="188">D14</text>
+              <text x="300" y="188">D21</text>
+              <text x="382" y="188">D28</text>
+            </g>
+          </svg>
+          <figcaption class="legend">
+            <span><i></i>合作貼文</span>
+            <span><i class="dash"></i>基準貼文</span>
+            <span><i class="dot"></i>評估節點</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="alt" id="problem">
+      <div class="wrap">
+        <h2>為什麼需要 WaveScope</h2>
+        <p class="section-lead">和多位 IG 創作者合作時，團隊最常卡在這三件事。</p>
+        <div class="grid-3">
+          <div class="card">
+            <span class="num">01</span>
+            <h3>報表靠人工</h3>
+            <p>逐篇截圖、抄數字，才能整理出一份結案報表，費時又容易出錯。</p>
+          </div>
+          <div class="card">
+            <span class="num">02</span>
+            <h3>比較不公平</h3>
+            <p>發布時間不同、有沒有加熱不同、觀看的定義也不同，數字放在一起比，結論常常失真。</p>
+          </div>
+          <div class="card">
+            <span class="num">03</span>
+            <h3>選人缺數據</h3>
+            <p>挑下一次的合作人選和加熱素材時，手上沒有客觀、能直接比較的資料。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="wrap">
+        <h2>主要功能</h2>
+        <p class="section-lead">從登錄合作貼文、定期擷取數據，到比較創作者、監測議題，都在同一個地方完成。</p>
+        <div class="grid-2">
+          <div class="card">
+            <h3>活動與合作管理</h3>
+            <p>管理活動、創作者、合作與約定交付。貼上 IG 網址就能登錄合作貼文，自動計算交付達成率。</p>
+          </div>
+          <div class="card">
+            <h3>定期擷取與每日變化</h3>
+            <p>定期保存每則貼文的數據快照，看得到每日增量、7 日移動平均與異常變化，不必再手動回頭查。</p>
+          </div>
+          <div class="card">
+            <h3>在評估節點公平比較</h3>
+            <p>所有合作都在發布後第 1、3、7、14…天比較，並以 CPE（每次互動成本）為主要指標；口徑不一致的數字不放進同一張比較表。</p>
+          </div>
+          <div class="card">
+            <h3>相對表現</h3>
+            <p>把合作貼文和同一創作者平常的貼文比較，看出業配內容的表現是否比平常差。</p>
+          </div>
+          <div class="card">
+            <h3>創作者觀察與選人支援</h3>
+            <p>不必先合作也能持續觀察創作者帳號。輸入報價即可算出預估 CPE，並列出值得加熱的內容。</p>
+          </div>
+          <div class="card">
+            <h3>議題聲量監測</h3>
+            <p>以 IG hashtag 定義議題，追蹤聲量變化與異常；也能對照活動期間，看議題聲量的同步變化。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="principles">
+      <div class="wrap">
+        <h2>我們的資料原則</h2>
+        <p class="section-lead">讓數字可以被信任，比讓數字看起來漂亮更重要。</p>
+        <ul class="principles">
+          <li>
+            <span class="icon" aria-hidden="true">1</span>
+            <div>
+              <h3>只用 Meta 官方 API，不使用爬蟲</h3>
+              <p>數據只來自 Instagram 官方提供的介面，以及創作者主動授權的資料。官方拿不到的數字，畫面上會直接標示「未取得」，不會用其他方式補上。</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon" aria-hidden="true">2</span>
+            <div>
+              <h3>不同來源分開保存，永不合併</h3>
+              <p>公開數據、創作者授權數據、手動輸入，各自保存、各自標示。含付費加熱的觀看與自然觀看不會混在一起。</p>
+            </div>
+          </li>
+          <li>
+            <span class="icon" aria-hidden="true">3</span>
+            <div>
+              <h3>不做綜合分數</h3>
+              <p>權重藏著主觀假設，也會掩蓋需要人判斷的訊號。我們提供完整的指標與多維視覺化，把判斷留給你。</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="status">
+      <div class="wrap">
+        <h2>目前進度</h2>
+        <p class="section-lead">WaveScope 正在開發中，第一版只支援 Instagram。</p>
+        <ol class="status">
+          <li class="now"><strong>平台可行性驗證</strong><span>確認 Meta 官方 API 的實際能力（進行中）</span></li>
+          <li><strong>核心版本</strong><span>合作管理、數據擷取、成效評估</span></li>
+          <li><strong>試營運</strong><span>以一檔真實活動驗證</span></li>
+          <li><strong>完整版本</strong><span>生命週期、選人支援、議題監測</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="alt contact" id="contact">
+      <div class="wrap">
+        <h2>聯絡我們</h2>
+        <p class="section-lead">想了解 WaveScope、討論合作，或對資料使用有任何疑問，歡迎來信，我們會盡快回覆。</p>
+        <a class="btn" href="mailto:{{CONTACT_EMAIL}}?subject=%E8%A9%A2%E5%95%8F%20WaveScope">寄信給我們</a>
+        <div><a class="email" href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <dl>
+        <dt>公司</dt><dd>{{COMPANY_NAME_ZH}}</dd>
+        <dt>統一編號</dt><dd>{{TAX_ID}}</dd>
+        <dt>地址</dt><dd>{{ADDRESS_ZH}}</dd>
+        <dt>電話</dt><dd>{{PHONE}}</dd>
+        <dt>Email</dt><dd><a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a></dd>
+      </dl>
+      <nav aria-label="頁尾">
+        <a href="privacy.html">隱私權政策</a>
+        <a href="./en/" hreflang="en" lang="en">English</a>
+      </nav>
+    </div>
+    <div class="wrap" style="margin-top:24px">© 2026 {{COMPANY_NAME_ZH}}。Instagram 為 Meta Platforms, Inc. 的商標，本服務與 Meta 無隸屬關係。</div>
+  </footer>
+</body>
+</html>
