@@ -1,5 +1,6 @@
 /* 色彩與規則對齊產品的 DESIGN.md（方向 B・健康檢查報告）：
-   單一墨綠品牌色、冷灰檯面上的白色直角報告單、不加陰影；琥珀／藍只用在 H／L 旗標。 */
+   單一墨綠品牌色、冷灰檯面上的白色直角報告單、不加陰影；琥珀／藍只用在 H／L 旗標。
+   產品沒有深色模式，官網也固定為淺色。 */
 :root {
   --report-teal: #0f766e;
   --report-teal-deep: #0b5a54;
@@ -20,31 +21,8 @@
   --flag-l-ink: #075985;
   --on-teal: #ffffff;
   --max: 1080px;
+  color-scheme: light;
   --font: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
-}
-
-/* 產品端沒有深色模式；這裡依同一組語意推出深色值。 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --report-teal: #3fbfae;
-    --report-teal-deep: #6fd3c4;
-    --teal-tint: #16302c;
-    --teal-band: #1f4a43;
-    --ink: #e4e8eb;
-    --ink-muted: #a3adb6;
-    --ink-absent: #8f9aa5;
-    --rule-strong: #5b6670;
-    --rule: #3a444c;
-    --hairline: #2a3238;
-    --bench: #111618;
-    --sheet: #1a2024;
-    --sheet-foot: #1e2529;
-    --flag-h-bg: #4a3410;
-    --flag-h-ink: #fcd38a;
-    --flag-l-bg: #0c3550;
-    --flag-l-ink: #a5d8f5;
-    --on-teal: #06201c;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -93,10 +71,10 @@ a:hover { color: var(--report-teal-deep); }
   gap: 10px;
   font-size: 18px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--report-teal);
   text-decoration: none;
 }
-.brand:hover { color: var(--ink); }
+.brand:hover { color: var(--report-teal); }
 .nav {
   display: flex;
   align-items: center;
