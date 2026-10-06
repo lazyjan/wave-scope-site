@@ -29,7 +29,7 @@
   <main class="legal">
     <div class="wrap">
       <h1>Privacy Policy</h1>
-      <p class="updated">Effective date: October 1, 2026</p>
+      <p class="updated">Effective date: October 6, 2026</p>
 
       <p>This policy explains how Wave Scope ("we", "us") collects, uses, stores and deletes data when providing WaveScope (the "Service"). The Service is a marketing analytics tool used internally by our team and is not open for public sign-up. If this English version differs from the Traditional Chinese version, the Traditional Chinese version prevails.</p>
 
@@ -51,7 +51,11 @@
           </tr>
           <tr>
             <td>Manual input by our team</td>
-            <td>Collaboration fees, agreed deliverables, quotes, and figures shared with us by creators.</td>
+            <td>Collaboration fees (cash, vouchers and product samples), agreed deliverables, quotes, and dashboard figures shared with us by creators (such as shares, saves and Story views). URLs and performance figures of Threads posts are also entered manually only.</td>
+          </tr>
+          <tr>
+            <td>Dashboard screenshots provided by creators</td>
+            <td>Screenshots of Instagram or Threads dashboards that creators choose to send us. They serve as evidence for collaboration performance figures and are used to pre-fill the manual input above. Screenshots may include follower demographics (aggregated age, gender and location), but never identify individual followers.</td>
           </tr>
         </tbody>
       </table>
@@ -67,6 +71,7 @@
         <li>Public hashtag posts are kept for 180 days; captions are cleared after 90 days.</li>
         <li>For creator accounts we stop observing, regular (non-collaboration) post data is deleted one year after observation ends.</li>
         <li>Performance data of collaboration posts is kept with the campaign record for reporting and future evaluation.</li>
+        <li>Creator dashboard screenshots are stored on the Service's host and are visible only to signed-in team members. They are deleted together with the manual entry or collaboration post they belong to; screenshots not attached to any manual entry are deleted automatically after 30 days.</li>
       </ul>
 
       <h2>4. Revoking authorization and deleting data</h2>
@@ -75,10 +80,16 @@
         <li>Remove the Service under "Settings → Apps and websites" in Instagram or Facebook. When we receive Meta's data deletion request, we delete your access token, Insights data and follower demographics.</li>
         <li>Email <a href="mailto:hello.wavescope@gmail.com">hello.wavescope@gmail.com</a> with your Instagram username. We will complete the deletion and reply within 30 days after verifying your identity.</li>
       </ol>
+      <p>You may also email us to have the dashboard screenshots you provided deleted; we will delete them and reply within 30 days.</p>
       <p>After authorization is revoked, we may still keep public data obtained through public APIs (such as like counts on public posts), since anyone can view it. You may also email us to have that data deleted.</p>
 
       <h2>5. Third parties</h2>
-      <p>Our data source is Meta Platforms, Inc.; see the <a href="https://privacycenter.instagram.com/policy" rel="noopener">Instagram Privacy Policy</a> for how Meta handles data. We store data on a cloud host and do not share it with any other third party except as required by law.</p>
+      <p>Our data source is Meta Platforms, Inc.; see the <a href="https://privacycenter.instagram.com/policy" rel="noopener">Instagram Privacy Policy</a> for how Meta handles data.</p>
+      <ul>
+        <li><strong>Cloud hosting</strong>: data is stored on Amazon Web Services (AWS Lightsail, Tokyo region).</li>
+        <li><strong>Screenshot recognition</strong>: when automatic recognition is enabled, creator dashboard screenshots are sent to Anthropic's Claude API solely to read the figures and pre-fill the form; a team member must check the pre-filled figures before they are saved. Data obtained from Meta APIs is never sent to Anthropic.</li>
+      </ul>
+      <p>Apart from these service providers and as required by law, we do not share data with any other third party.</p>
 
       <h2>6. Changes to this policy</h2>
       <p>When this policy changes, we will update the effective date on this page. For material changes, we will notify creators who have authorized the Service.</p>
