@@ -230,6 +230,33 @@ h1 {
   color: var(--ink-muted);
 }
 
+/* 「你會拿到什麼」：每份交付物上方是縮小的報告單（沿用 .report），下方寫給誰、何時、內容。 */
+.deliverables { align-items: start; }
+/* 三張縮小報告單的列數不同；用 subgrid 讓它們同高，下方標題才會對齊。 */
+@supports (grid-template-rows: subgrid) {
+  .grid-3.deliverables { grid-template-rows: auto auto; row-gap: 0; }
+  .deliv { display: grid; grid-row: span 2; grid-template-rows: subgrid; }
+  .deliv .report.mini { align-self: stretch; }
+}
+.deliv .report.mini { padding: 14px 14px 10px; margin-bottom: 16px; }
+.report.mini .report-head { padding-bottom: 6px; }
+.report.mini .report-head .title { font-size: 14px; }
+.report.mini .report-head .sub { font-size: 12px; }
+.report.mini table { font-size: 13px; }
+.report.mini th { font-size: 12px; padding: 6px 4px 4px; }
+.report.mini td { padding: 6px 4px; white-space: nowrap; }
+.report.mini .reason { font-size: 12px; }
+.report.mini .flag { margin-right: 4px; }
+.deliv .num { font-size: 13px; font-weight: 700; color: var(--report-teal); display: block; margin-bottom: 4px; }
+.deliv h3 { font-size: 18px; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.deliv .state { font-size: 12px; font-weight: 500; padding: 0 6px; border-radius: 2px; border: 1px solid var(--report-teal); color: var(--report-teal); }
+.deliv .state.planned { border-color: var(--rule-strong); color: var(--ink-muted); }
+.deliv dl { margin: 0; border-top: 2px solid var(--ink); font-size: 14px; line-height: 1.6; }
+.deliv dl div { display: grid; grid-template-columns: 5.5em 1fr; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--hairline); }
+.deliv dt { color: var(--ink-muted); }
+.deliv dd { margin: 0; }
+:lang(en) .deliv dl div { grid-template-columns: 5em 1fr; }
+
 /* 合作貼文生命週期示範（assets/demo.js 產生內容）。沿用報告單的白底直角、細線與 H／L 旗標。 */
 .demo {
   background: var(--sheet);
@@ -504,6 +531,7 @@ h2 {
   .principles-layout { gap: 32px; }
   .status { flex-direction: column; }
   .demo { padding: 16px; }
+  .deliv + .deliv { margin-top: 32px; }
   .demo-grid { grid-template-columns: minmax(0, 1fr); }
   .demo-close dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .demo-status { flex-direction: column; gap: 2px; min-height: 6.4em; }
