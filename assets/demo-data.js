@@ -4,7 +4,7 @@
 window.WS_DEMO = {
   flagHigh: 1.2,
   flagLow: 0.8,
-  order: ['lifecycle', 'scout'],
+  order: ['lifecycle', 'watch', 'scout'],
   ui: {
     zh: { controls: { play: '播放', replay: '重播', pause: '暫停', resume: '繼續', skip: '跳到結果' }, tabs: '示範情境' },
     en: { controls: { play: 'Play', replay: 'Replay', pause: 'Pause', resume: 'Resume', skip: 'Skip to result' }, tabs: 'Demo scenarios' }
@@ -100,7 +100,83 @@ WS_DEMO.lifecycle = {
   }
 };
 
-/* 情境二：選人支援（規劃中，屬完整版本）。
+/* 情境二：創作者觀察（規劃中，與選人支援一起在完整版本推出）。
+   對象與「選人」情境同一位創作者 E；觀察 30 天後的追蹤者數與「選人」情境的帳號資料一致。
+   followers：觀察第 0～30 天的追蹤者數；第 18 天單日多出約 900 人。
+   posts：觀察期間發的貼文（第幾天、形式）。alertDay：追蹤者異常的那一天；倍數由播放器以平常單日增量的中位數算出。 */
+WS_DEMO.watch = {
+  planned: true,
+  followers: [46700, 46728, 46746, 46759, 46783, 46809, 46823, 46838, 46865, 46888, 46900, 46919, 46947, 46966, 46978, 47001,
+    47028, 47043, 47957, 47983, 48007, 48020, 48038, 48066, 48086, 48098, 48120, 48148, 48164, 48177, 48200],
+  posts: [[2, 'reels'], [5, 'carousel'], [9, 'reels'], [12, 'reels'], [16, 'carousel'], [20, 'reels'], [24, 'carousel'], [28, 'reels']],
+  alertDay: 18,
+
+  zh: {
+    tab: '還沒合作，先觀察',
+    tag: '規劃中',
+    steps: [
+      { title: '加入觀察', desc: '不必先合作：把創作者帳號加進觀察清單。先講清楚哪些數字拿得到、哪些拿不到。' },
+      { title: '每日追蹤', desc: '每天記錄追蹤者數，新貼文一發布就開始保存它的互動。' },
+      { title: '異常提醒', desc: '追蹤者單日暴增、互動卻沒有跟上，標出來給人判斷，不自動下結論。' },
+      { title: '觀察摘要', desc: '30 天後整理成摘要，可以直接帶進選人估算。' }
+    ],
+    day: function (d) { return '觀察第 ' + d + ' 天'; },
+    before: '尚未加入觀察',
+    note: '創作者觀察與選人支援一起在完整版本推出，此為規劃中的畫面；數據為虛構。',
+    handle: '@creator_e',
+    scope: {
+      title: '觀察帳號',
+      rows: [['追蹤者數', '每日記錄', 'ok'], ['貼文的讚與留言', '每則記錄', 'ok'], ['觀看、觸及', '未取得：官方 API 不提供他人帳號的數字', 'na']]
+    },
+    chart: { label: '追蹤者數', posts: '發文' },
+    log: {
+      title: '觀察紀錄',
+      post: function (d, i, f) { return 'D' + d + '　新貼文 ' + i + '（' + f + '），開始記錄互動'; },
+      alert: function (d, n) { return 'D' + d + '　追蹤者單日 +' + n + '，同期貼文互動沒有同步增加'; }
+    },
+    formats: { reels: 'Reels', carousel: '輪播' },
+    alert: { title: '待判斷', body: function (d, n, x) { return '第 ' + d + ' 天追蹤者單日增加 ' + n + ' 人，約是平常單日的 ' + x + ' 倍；同一週貼文的互動仍在平常範圍。'; }, hint: '可能是被大帳號轉發，也可能是買粉。系統只標出訊號，判斷留給你。' },
+    summary: {
+      title: '觀察摘要・30 天',
+      items: function (o) { return [['追蹤者', o.from + ' → ' + o.to], ['發文', o.posts + ' 則（Reels ' + o.reels + '、輪播 ' + o.carousel + '）'], ['異常', '1 次，待判斷'], ['觀看、觸及', '未取得']]; },
+      next: '帶進選人估算'
+    }
+  },
+
+  en: {
+    tab: 'Watch before you hire',
+    tag: 'Planned',
+    steps: [
+      { title: 'Add', desc: 'No collaboration needed: add the creator to a watchlist. First, be clear about which numbers are available and which aren\'t.' },
+      { title: 'Track', desc: 'Followers are recorded daily, and each new post\'s engagement is saved from the moment it goes up.' },
+      { title: 'Flag', desc: 'A one-day follower spike without matching engagement is flagged for a person to judge, not concluded automatically.' },
+      { title: 'Summary', desc: 'After 30 days it becomes a summary you can take straight into creator selection.' }
+    ],
+    day: function (d) { return 'Day ' + d + ' of watching'; },
+    before: 'Not watched yet',
+    note: 'Creator watching ships with creator selection in the full version. This is a planned screen with fictional data.',
+    handle: '@creator_e',
+    scope: {
+      title: 'Watched account',
+      rows: [['Followers', 'Recorded daily', 'ok'], ['Likes and comments per post', 'Recorded per post', 'ok'], ['Views, reach', 'Not available: the official API doesn\'t provide them for other accounts', 'na']]
+    },
+    chart: { label: 'Followers', posts: 'Posts' },
+    log: {
+      title: 'Watch log',
+      post: function (d, i, f) { return 'D' + d + '  New post ' + i + ' (' + f + '), engagement tracking started'; },
+      alert: function (d, n) { return 'D' + d + '  Followers +' + n + ' in one day; engagement on recent posts didn\'t rise with it'; }
+    },
+    formats: { reels: 'Reels', carousel: 'carousel' },
+    alert: { title: 'Needs a look', body: function (d, n, x) { return 'On day ' + d + ' followers rose by ' + n + ' in one day, about ' + x + ' times a usual day. Engagement that week stayed in the usual range.'; }, hint: 'It could be a repost by a large account, or bought followers. WaveScope only flags the signal; the call is yours.' },
+    summary: {
+      title: 'Watch summary · 30 days',
+      items: function (o) { return [['Followers', o.from + ' → ' + o.to], ['Posts', o.posts + ' (Reels ' + o.reels + ', carousel ' + o.carousel + ')'], ['Flags', '1, needs a look'], ['Views, reach', 'Not available']]; },
+      next: 'Take into creator selection'
+    }
+  }
+};
+
+/* 情境三：選人支援（規劃中，屬完整版本）。
    posts：創作者 E 近期 8 則貼文的 D14 互動，null 代表讚數被隱藏、不計入基準。
    基準 = 可用貼文的中位數；可用貼文少於 minPosts 則不估算 CPE。
    candidates 的第一位就是 E（基準由 posts 算出）；其他人直接給基準或可用貼文數。

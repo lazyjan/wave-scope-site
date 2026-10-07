@@ -327,6 +327,14 @@ h1 {
 .demo-quote { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--ink-muted); }
 .demo-quote .demo-input { flex: 0 0 9em; margin: 0; text-align: right; color: var(--ink); font-weight: 500; }
 .demo-ref { margin: 8px 0 0; font-size: 13px; color: var(--ink-muted); }
+.demo-panel dl div.is-na dd { color: var(--ink-absent); font-weight: 400; }
+.demo-alert p { margin: 0; }
+.demo-alert-hint { margin-top: 6px !important; font-size: 13px; color: var(--ink-muted); }
+.demo-chart .mark { stroke: var(--report-teal); stroke-width: 2; }
+.demo-chart .node.alert { fill: var(--ink); }
+.demo-legend .is-mark::before { width: 0; height: 10px; border-top: 0; border-left: 2px solid var(--report-teal); }
+.demo-summary[hidden] { display: none; }
+.demo-summary .btn { height: 36px; padding: 0 14px; font-size: 14px; font-family: inherit; cursor: pointer; margin: 10px 0 0; }
 .demo-boost ul { list-style: none; margin: 0; padding: 0; }
 .demo-boost li { padding: 4px 0; border-bottom: 1px solid var(--hairline); }
 .demo-boost li.is-na { color: var(--ink-absent); border-bottom: 0; }

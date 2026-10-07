@@ -77,6 +77,29 @@
     return a.length % 2 ? a[m] : Math.round((a[m - 1] + a[m]) / 2);
   }
 
+  /** 折線圖的座標軸與格線。x 為第 0～xMax 天；yTicks 的第一個值是圖的底線。
+      回傳 el（svg）、x()／y() 換算，以及 line(arr, upto) 產生前 upto 天的路徑。 */
+  function axes(o) {
+    var X0 = o.left || 44, X1 = 388, Y0 = 150, Y1 = 16;
+    var yMin = o.yTicks[0], yMax = o.yTicks[o.yTicks.length - 1];
+    function x(d) { return X0 + (X1 - X0) * d / o.xMax; }
+    function y(v) { return Y0 - (Y0 - Y1) * (v - yMin) / (yMax - yMin); }
+    var s = svg('svg', { viewBox: '0 0 400 176', role: 'img', 'aria-label': o.label });
+    o.yTicks.forEach(function (v, i) {
+      s.appendChild(svg('line', { x1: X0, x2: X1, y1: y(v), y2: y(v), 'class': i ? 'grid' : 'grid zero' }));
+      s.appendChild(svg('text', { x: X0 - 6, y: y(v) + 4, 'text-anchor': 'end', 'class': 'axis' }, fmt(v)));
+    });
+    o.xTicks.forEach(function (d) {
+      s.appendChild(svg('text', { x: x(d), y: 170, 'text-anchor': 'middle', 'class': 'axis' }, 'D' + d));
+    });
+    function line(arr, upto) {
+      return arr.slice(0, upto + 1).map(function (v, i) {
+        return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1);
+      }).join(' ');
+    }
+    return { el: s, x: x, y: y, line: line };
+  }
+
   /** 可暫停、可跳過、可作廢的等待。回傳 false 代表這一輪已作廢，呼叫端要立刻收手。 */
   function wait(ms, token) {
     if (reduceMotion) ms = 0;
@@ -235,8 +258,10 @@
     /* 合作貼文生命週期：登錄 → 每日快照與節點比較（D7 插入截圖補值）→ 結案。 */
     lifecycle: function (stage, T, C) {
       var LAST = C.series.post.length - 1;
-      /* 圖的座標：x 為發布後第 0～14 天，y 為 0～5,000 互動。 */
-      var X0 = 44, X1 = 388, Y0 = 150, Y1 = 16, YMAX = 5000;
+      var ax = axes({ label: T.chart.label, xMax: LAST, yTicks: [0, 2500, 5000], xTicks: [0].concat(C.nodes) });
+      ax.el.appendChild(svg('path', { 'class': 'base', fill: 'none' }));
+      ax.el.appendChild(svg('path', { 'class': 'curve', fill: 'none' }));
+      ax.el.appendChild(svg('g', { 'class': 'nodes' }));
       function q(sel) { return stage.querySelector(sel); }
 
       var grid = h('div', 'demo-grid');
@@ -265,7 +290,7 @@
       legend.appendChild(h('span', 'is-post', T.chart.post));
       legend.appendChild(h('span', 'is-base', T.chart.base));
       chart.appendChild(legend);
-      chart.appendChild(buildSvg());
+      chart.appendChild(ax.el);
       right.appendChild(chart);
 
       var nodes = panel(T.table.title, 'demo-nodes');
@@ -286,33 +311,10 @@
       stage.appendChild(grid);
       stage.appendChild(h('div', 'demo-close'));
 
-      function x(d) { return X0 + (X1 - X0) * d / LAST; }
-      function y(v) { return Y0 - (Y0 - Y1) * v / YMAX; }
-
-      function buildSvg() {
-        var s = svg('svg', { viewBox: '0 0 400 176', role: 'img', 'aria-label': T.chart.label });
-        [0, 2500, 5000].forEach(function (v) {
-          s.appendChild(svg('line', { x1: X0, x2: X1, y1: y(v), y2: y(v), 'class': v ? 'grid' : 'grid zero' }));
-          s.appendChild(svg('text', { x: X0 - 6, y: y(v) + 4, 'text-anchor': 'end', 'class': 'axis' }, fmt(v)));
-        });
-        [0].concat(C.nodes).forEach(function (d) {
-          s.appendChild(svg('text', { x: x(d), y: 170, 'text-anchor': 'middle', 'class': 'axis' }, 'D' + d));
-        });
-        s.appendChild(svg('path', { 'class': 'base', fill: 'none' }));
-        s.appendChild(svg('path', { 'class': 'curve', fill: 'none' }));
-        s.appendChild(svg('g', { 'class': 'nodes' }));
-        return s;
-      }
-
       function setDay(d) {
         ctx.stamp(d < 0 ? T.before : T.day(d));
-        var line = function (arr) {
-          return arr.slice(0, Math.max(d, 0) + 1).map(function (v, i) {
-            return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1);
-          }).join(' ');
-        };
-        q('.demo-chart .curve').setAttribute('d', d > 0 ? line(C.series.post) : '');
-        q('.demo-chart .base').setAttribute('d', d > 0 ? line(C.series.base) : '');
+        q('.demo-chart .curve').setAttribute('d', d > 0 ? ax.line(C.series.post, d) : '');
+        q('.demo-chart .base').setAttribute('d', d > 0 ? ax.line(C.series.base, d) : '');
       }
 
       function addLog(text, cls) {
@@ -333,7 +335,7 @@
         var td = h('td');
         flagCell(td, ratio, T.table);
         tr.appendChild(td);
-        q('.demo-chart .nodes').appendChild(svg('circle', { cx: x(d), cy: y(post), r: 4, 'class': 'node' }));
+        q('.demo-chart .nodes').appendChild(svg('circle', { cx: ax.x(d), cy: ax.y(post), r: 4, 'class': 'node' }));
       }
 
       function reset() {
@@ -424,6 +426,132 @@
           acts.appendChild(h('span', 'demo-fake-btn', t));
         });
         close.appendChild(acts);
+        return true;
+      }
+
+      return { reset: reset, run: run };
+    },
+
+    /* 創作者觀察：加入觀察（先講清楚拿得到什麼）→ 每日追蹤 → 追蹤者異常交給人判斷 → 摘要帶進選人。 */
+    watch: function (stage, T, C) {
+      var LAST = C.followers.length - 1;
+      function q(sel) { return stage.querySelector(sel); }
+
+      /* 異常倍數 = 異常當天的增量 ÷ 其他日子單日增量的中位數。 */
+      var deltas = [];
+      for (var k = 1; k <= LAST; k++) if (k !== C.alertDay) deltas.push(C.followers[k] - C.followers[k - 1]);
+      var jump = C.followers[C.alertDay] - C.followers[C.alertDay - 1];
+      var times = Math.round(jump / median(deltas));
+      var postOn = {};
+      C.posts.forEach(function (p, i) { postOn[p[0]] = { n: i + 1, f: T.formats[p[1]] }; });
+
+      var grid = h('div', 'demo-grid');
+      var left = h('div', 'demo-col');
+      var right = h('div', 'demo-col');
+
+      var scope = panel(T.scope.title, 'demo-scope');
+      scope.appendChild(h('div', 'demo-url'));
+      scope.appendChild(h('dl'));
+      left.appendChild(scope);
+
+      var alert = panel(T.alert.title, 'demo-shot demo-alert');
+      alert.appendChild(h('p', 'demo-alert-body'));
+      alert.appendChild(h('p', 'demo-alert-hint', T.alert.hint));
+      left.appendChild(alert);
+
+      var log = panel(T.log.title, 'demo-log');
+      log.appendChild(h('ul'));
+      left.appendChild(log);
+
+      var ax = axes({ label: T.chart.label, xMax: LAST, yTicks: [46500, 47500, 48500], xTicks: [0, 10, 20, 30], left: 56 });
+      ax.el.appendChild(svg('g', { 'class': 'marks' }));
+      ax.el.appendChild(svg('path', { 'class': 'curve', fill: 'none' }));
+      ax.el.appendChild(svg('g', { 'class': 'nodes' }));
+      var chart = panel(T.chart.label, 'demo-chart');
+      var legend = h('div', 'demo-legend');
+      legend.appendChild(h('span', 'is-post', T.chart.label));
+      legend.appendChild(h('span', 'is-mark', T.chart.posts));
+      chart.appendChild(legend);
+      chart.appendChild(ax.el);
+      right.appendChild(chart);
+
+      var sum = h('div', 'demo-panel demo-summary');
+      right.appendChild(sum);
+
+      grid.appendChild(left);
+      grid.appendChild(right);
+      stage.appendChild(grid);
+
+      function setDay(d) {
+        ctx.stamp(d < 0 ? T.before : T.day(d));
+        q('.demo-chart .curve').setAttribute('d', d >= 0 ? ax.line(C.followers, d) : '');
+      }
+
+      function addLog(text, cls) {
+        var ul = q('.demo-log ul');
+        ul.appendChild(h('li', cls || null, text));
+        ul.scrollTop = ul.scrollHeight;
+      }
+
+      function reset() {
+        q('.demo-url').textContent = '';
+        q('.demo-scope dl').innerHTML = '';
+        q('.demo-alert').hidden = true;
+        q('.demo-alert-body').textContent = '';
+        q('.demo-log ul').innerHTML = '';
+        q('.demo-chart .marks').innerHTML = '';
+        q('.demo-chart .nodes').innerHTML = '';
+        sum.innerHTML = '';
+        sum.hidden = true;
+        setDay(-1);
+      }
+
+      async function run(token) {
+        ctx.setStep(0);
+        if (!await type(q('.demo-url'), T.handle, token)) return;
+        if (!await wait(500, token)) return;
+        var dl = q('.demo-scope dl');
+        for (var r = 0; r < T.scope.rows.length; r++) {
+          var row = T.scope.rows[r];
+          addRow(dl, row[0], row[1], row[2] === 'na' ? 'is-na' : null);
+          if (!await wait(row[2] === 'na' ? 1200 : 300, token)) return;
+        }
+        if (!await wait(600, token)) return;
+
+        ctx.setStep(1);
+        for (var d = 0; d <= LAST; d++) {
+          setDay(d);
+          var p = postOn[d];
+          if (p) {
+            q('.demo-chart .marks').appendChild(svg('line', { x1: ax.x(d), x2: ax.x(d), y1: 150, y2: 141, 'class': 'mark' }));
+            addLog(T.log.post(d, p.n, p.f));
+          }
+          if (d === C.alertDay) {
+            ctx.setStep(2);
+            q('.demo-chart .nodes').appendChild(svg('circle', { cx: ax.x(d), cy: ax.y(C.followers[d]), r: 4, 'class': 'node alert' }));
+            addLog(T.log.alert(d, fmt(jump)), 'is-note');
+            q('.demo-alert-body').textContent = T.alert.body(d, fmt(jump), times);
+            q('.demo-alert').hidden = false;
+            if (!await wait(2600, token)) return;
+            ctx.setStep(1);
+          }
+          if (!await wait(260, token)) return;
+        }
+
+        ctx.setStep(3);
+        sum.hidden = false;
+        sum.appendChild(h('div', 'demo-close-title', T.summary.title));
+        var sdl = h('dl');
+        var reels = C.posts.filter(function (p) { return p[1] === 'reels'; }).length;
+        T.summary.items({
+          from: fmt(C.followers[0]), to: fmt(C.followers[LAST]),
+          posts: C.posts.length, reels: reels, carousel: C.posts.length - reels
+        }).forEach(function (it) { addRow(sdl, it[0], it[1]); });
+        sum.appendChild(sdl);
+        var next = h('button', 'btn ghost demo-next', T.summary.next + ' →');
+        next.type = 'button';
+        next.addEventListener('click', function () { select('scout'); });
+        sum.appendChild(next);
         return true;
       }
 
