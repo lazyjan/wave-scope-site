@@ -3,6 +3,7 @@
    寫在下方 SCENARIOS 裡，回傳 { reset, run }。
 
    載入或切換情境時直接把最終畫面跑完（沒按播放的人也看得到結果），按「播放」才從頭演一次。
+   每個情境有自己的網址 #demo-<key>，打開就直接進到那個情境；切換分頁時網址跟著換。
    每一輪播放都拿一個 token；重播或切換情境時舊的那一輪看到 token 變了就立刻停手，
    不會兩輪同時往畫面寫。系統開啟「減少動態效果」時，等待一律為 0。 */
 (function () {
@@ -58,15 +59,15 @@
     thead.appendChild(tr);
     table.appendChild(thead);
   }
-  /** 依門檻填入 H／L 旗標或「平常範圍」。 */
+  /** 依門檻填入 H／L 旗標或「平常範圍」。旗標旁的文字在窄螢幕會藏起來，只留 H／L。 */
   function flagCell(td, ratio, T) {
     td.innerHTML = '';
     if (ratio >= D.flagHigh) {
       td.appendChild(h('span', 'flag h', 'H'));
-      td.appendChild(document.createTextNode(T.high));
+      td.appendChild(h('span', 'flag-text', T.high));
     } else if (ratio <= D.flagLow) {
       td.appendChild(h('span', 'flag l', 'L'));
-      td.appendChild(document.createTextNode(T.low));
+      td.appendChild(h('span', 'flag-text', T.low));
     } else {
       td.textContent = T.normal;
     }
@@ -115,10 +116,11 @@
     });
   }
 
-  /** 逐字打進 el；被作廢時回傳 false。 */
+  /** 逐字打進 el（輸入框則寫進 value）；被作廢時回傳 false。 */
   async function type(el, text, token) {
+    var prop = el.tagName === 'INPUT' ? 'value' : 'textContent';
     for (var i = 1; i <= text.length; i++) {
-      el.textContent = text.slice(0, i);
+      el[prop] = text.slice(0, i);
       if (!await wait(22, token)) return false;
     }
     return true;
@@ -144,7 +146,7 @@
         b.type = 'button';
         b.dataset.key = key;
         if (t.tag) b.appendChild(h('span', 'demo-tag', t.tag));
-        b.addEventListener('click', function () { if (S.key !== key) select(key); });
+        b.addEventListener('click', function () { if (S.key !== key) select(key, true); });
         tabs.appendChild(b);
       });
       root.appendChild(tabs);
@@ -174,8 +176,12 @@
 
     shell.stage = h('div', 'demo-stage');
     root.appendChild(shell.stage);
+    var foot = h('div', 'demo-foot');
     shell.note = h('p', 'demo-note');
-    root.appendChild(shell.note);
+    shell.cta = h('a', 'demo-cta');
+    foot.appendChild(shell.note);
+    foot.appendChild(shell.cta);
+    root.appendChild(foot);
   }
 
   function control(cls, fn) {
@@ -198,7 +204,8 @@
     type: type
   };
 
-  function select(key) {
+  /** 切換情境。fromUser 時把網址換成 #demo-<key>，方便直接分享這個情境。 */
+  function select(key, fromUser) {
     S.token++;
     S.key = key;
     T = D[key][lang];
@@ -216,8 +223,24 @@
     });
     shell.stage.innerHTML = '';
     shell.note.textContent = T.note;
+    var planned = D[key].planned ? 'planned' : 'live';
+    shell.cta.textContent = U.cta[planned];
+    shell.cta.href = 'mailto:' + D.email + '?subject=' + encodeURIComponent(U.subject[planned](T.tab));
+    if (fromUser && window.history && history.replaceState) {
+      try { history.replaceState(null, '', '#demo-' + key); } catch (e) { /* file:// 等環境 */ }
+    }
     current = SCENARIOS[key](shell.stage, T, D[key]);
     start(true);
+  }
+
+  /** 網址是 #demo-<key> 時切到那個情境並捲到示範區；回傳是否有對應的情境。 */
+  function fromHash() {
+    var m = /^#demo-([a-z]+)$/.exec(location.hash);
+    if (!m || D.order.indexOf(m[1]) < 0) return false;
+    if (S.key !== m[1]) select(m[1]);
+    var section = root.closest('section');
+    if (section) section.scrollIntoView();
+    return true;
   }
 
   function sync() {
@@ -416,16 +439,178 @@
         var close = q('.demo-close');
         close.hidden = false;
         close.appendChild(h('div', 'demo-close-title', T.close.title));
+
+        /* 成本口徑可以切換：只算現金，或含禮券與樣品。切換時重算 CPE。 */
+        var basis = h('div', 'demo-seg');
+        basis.setAttribute('role', 'group');
+        basis.setAttribute('aria-label', T.close.basis.label);
+        basis.appendChild(h('span', 'demo-seg-label', T.close.basis.label));
         var cdl = h('dl');
-        T.close.items((C.cost / post).toFixed(2), (post / C.series.base[LAST]).toFixed(2)).forEach(function (it) {
-          addRow(cdl, it[0], it[1]);
+        function render(key) {
+          cdl.innerHTML = '';
+          var cost = C.costs[key];
+          var items = T.close.items((cost / post).toFixed(2), (post / C.series.base[LAST]).toFixed(2));
+          items.splice(1, 0, [T.close.basis.cost, 'NT$' + fmt(cost)]);
+          items.forEach(function (it) { addRow(cdl, it[0], it[1]); });
+          basis.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.key === key)); });
+        }
+        ['cash', 'full'].forEach(function (key) {
+          var b = h('button', 'demo-seg-btn', T.close.basis[key]);
+          b.type = 'button';
+          b.dataset.key = key;
+          b.addEventListener('click', function () { render(key); });
+          basis.appendChild(b);
         });
+        close.appendChild(basis);
         close.appendChild(cdl);
+        render('cash');
         var acts = h('div', 'demo-close-acts');
         [T.close.report, T.close.csv].forEach(function (t) {
           acts.appendChild(h('span', 'demo-fake-btn', t));
         });
         close.appendChild(acts);
+        return true;
+      }
+
+      return { reset: reset, run: run };
+    },
+
+    /* 公平比較：照日曆看四條曲線 → 平移對齊到發布日 → 在 D7 和各自的基準比較。 */
+    compare: function (stage, T, C) {
+      function q(sel) { return stage.querySelector(sel); }
+      var drawn = C.creators.filter(function (c) { return c.series; });
+      var ax = axes({ label: T.chart.label, xMax: C.today, yTicks: [0, 2500, 5000], xTicks: [] });
+      var labels = svg('g', { 'class': 'xlabels' });
+      ax.el.appendChild(labels);
+      ax.el.appendChild(svg('line', { 'class': 'node-line', x1: ax.x(C.node), x2: ax.x(C.node), y1: 150, y2: 16 }));
+      drawn.forEach(function (c) {
+        ax.el.appendChild(svg('path', { 'class': 'curve', fill: 'none', 'data-key': c.key }));
+        ax.el.appendChild(svg('text', { 'class': 'tag post', 'data-key': c.key }, c.key));
+      });
+      ax.el.appendChild(svg('g', { 'class': 'nodes' }));
+
+      var grid = h('div', 'demo-grid demo-grid-wide');
+      var chart = panel(T.chart.label, 'demo-chart');
+      chart.appendChild(h('div', 'demo-legend demo-axis-mode'));
+      chart.appendChild(ax.el);
+      grid.appendChild(chart);
+      var tpanel = panel('', 'demo-nodes');
+      tpanel.appendChild(h('table'));
+      tpanel.appendChild(h('p', 'demo-ref'));
+      grid.appendChild(tpanel);
+      stage.appendChild(grid);
+
+      function date(idx) { return T.date(C.start[0], C.start[1] + idx); }
+      function setLabels(aligned) {
+        labels.innerHTML = '';
+        [0, 7, 14, C.today].forEach(function (i) {
+          var text = aligned ? (i === C.today ? '' : 'D' + i) : date(i);
+          labels.appendChild(svg('text', { x: ax.x(i), y: 170, 'text-anchor': 'middle', 'class': 'axis' }, text));
+        });
+        q('.demo-axis-mode').textContent = aligned ? T.chart.aligned : T.chart.calendar;
+      }
+
+      /* t：0 為照日曆排列、1 為全部對齊到發布日。upto：日曆上畫到第幾天。 */
+      function draw(t, upto) {
+        drawn.forEach(function (c) {
+          var off = c.posted * (1 - t);
+          var pts = [];
+          c.series.forEach(function (v, i) {
+            if (c.posted + i <= upto) pts.push([off + i, v]);
+          });
+          var path = q('.curve[data-key="' + c.key + '"]');
+          var tag = q('.tag[data-key="' + c.key + '"]');
+          if (!pts.length) { path.setAttribute('d', ''); tag.textContent = ''; return; }
+          path.setAttribute('d', pts.map(function (p, i) {
+            return (i ? 'L' : 'M') + ax.x(p[0]).toFixed(1) + ',' + ax.y(p[1]).toFixed(1);
+          }).join(' '));
+          var last = pts[pts.length - 1];
+          tag.textContent = c.key;
+          tag.setAttribute('x', (ax.x(last[0]) + 5).toFixed(1));
+          tag.setAttribute('y', (ax.y(last[1]) + 4).toFixed(1));
+        });
+      }
+
+      function table(cols) {
+        var t = q('.demo-nodes table');
+        t.innerHTML = '';
+        headRow(t, cols);
+        t.appendChild(h('tbody'));
+        return t.querySelector('tbody');
+      }
+
+      function reset() {
+        ctx.stamp(T.stamp.calendar);
+        setLabels(false);
+        draw(0, -1);
+        q('.node-line').style.display = 'none';
+        q('.demo-chart .nodes').innerHTML = '';
+        q('.demo-nodes .demo-ph').textContent = T.table.title.calendar;
+        table([T.table.creator, T.table.posted, T.table.age, T.table.value]);
+        q('.demo-ref').textContent = '';
+      }
+
+      async function run(token) {
+        ctx.setStep(0);
+        for (var day = 0; day <= C.today; day++) {
+          draw(0, day);
+          if (!await wait(110, token)) return;
+        }
+        var tb = q('.demo-nodes tbody');
+        for (var i = 0; i < C.creators.length; i++) {
+          var c = C.creators[i];
+          var age = C.today - c.posted;
+          var tr = h('tr', 'is-new');
+          tr.appendChild(h('td', null, T.name(c.key)));
+          tr.appendChild(h('td', null, date(c.posted)));
+          tr.appendChild(h('td', null, T.table.days(age)));
+          tr.appendChild(c.series ? h('td', 'val', fmt(c.series[age])) : h('td', 'na', T.table.hidden));
+          tb.appendChild(tr);
+          if (!await wait(250, token)) return;
+        }
+        q('.demo-ref').textContent = T.table.unfair;
+        if (!await wait(1800, token)) return;
+
+        ctx.setStep(1);
+        ctx.stamp(T.stamp.aligned);
+        for (var f = 1; f <= 24; f++) {
+          var t = f / 24;
+          draw(1 - Math.pow(1 - t, 3), C.today);
+          if (f === 12) setLabels(true);
+          if (!await wait(40, token)) return;
+        }
+        draw(1, C.today);
+        setLabels(true);
+        if (!await wait(1000, token)) return;
+
+        ctx.setStep(2);
+        q('.node-line').style.display = '';
+        q('.demo-nodes .demo-ph').textContent = T.table.title.aligned;
+        q('.demo-ref').textContent = '';
+        tb = table([T.table.creator, T.table.value, T.table.base, T.table.ratio, T.table.flag]);
+        for (var j = 0; j < C.creators.length; j++) {
+          var cr = C.creators[j];
+          var row = h('tr', 'is-new');
+          row.appendChild(h('td', null, T.name(cr.key)));
+          if (cr.series) {
+            var v = cr.series[C.node];
+            var ratio = v / cr.base7;
+            row.appendChild(h('td', 'val', fmt(v)));
+            row.appendChild(h('td', null, fmt(cr.base7)));
+            row.appendChild(h('td', null, '×' + ratio.toFixed(2)));
+            var td = h('td');
+            flagCell(td, ratio, T);
+            row.appendChild(td);
+            q('.demo-chart .nodes').appendChild(svg('circle', { cx: ax.x(C.node), cy: ax.y(v), r: 4, 'class': 'node' }));
+          } else {
+            row.appendChild(h('td', 'na', T.table.hidden));
+            var why = h('td', 'reason', T.table.hiddenReason);
+            why.colSpan = 3;
+            row.appendChild(why);
+          }
+          tb.appendChild(row);
+          if (!await wait(450, token)) return;
+        }
         return true;
       }
 
@@ -584,9 +769,28 @@
 
       var cpe = panel(T.cpe.title, 'demo-cpe');
       var quote = h('div', 'demo-quote');
-      quote.appendChild(h('span', null, T.cpe.quote));
-      quote.appendChild(h('span', 'demo-url demo-input'));
+      var qlabel = h('label', null, T.cpe.quote);
+      qlabel.htmlFor = 'wsDemoQuote';
+      quote.appendChild(qlabel);
+      var qbox = h('span', 'demo-url demo-input', 'NT$');
+      var input = h('input');
+      input.id = 'wsDemoQuote';
+      input.type = 'text';
+      input.inputMode = 'numeric';
+      input.autocomplete = 'off';
+      qbox.appendChild(input);
+      quote.appendChild(qbox);
       cpe.appendChild(quote);
+      cpe.appendChild(h('div', 'demo-try', T.cpe.tryIt));
+
+      /* 播完之後報價可以自己改，創作者 E 的預估 CPE 即時重算。 */
+      input.addEventListener('input', function () {
+        var row = q('.demo-cpe tr[data-key="E"]');
+        if (!row) return;
+        var price = parseInt(input.value.replace(/[^0-9]/g, ''), 10);
+        row.children[1].textContent = price > 0 ? fmt(price) : '—';
+        row.children[3].textContent = price > 0 ? 'NT$' + (price / base).toFixed(2) : T.cpe.invalid;
+      });
       var ctable = h('table');
       headRow(ctable, [T.cpe.creator, T.cpe.price, T.cpe.base, T.cpe.est]);
       ctable.appendChild(h('tbody'));
@@ -609,7 +813,9 @@
         q('.demo-acct .demo-delivered').textContent = '';
         q('.demo-posts tbody').innerHTML = '';
         q('.demo-basis').textContent = '';
-        q('.demo-input').textContent = '';
+        input.value = '';
+        input.disabled = true;
+        q('.demo-try').hidden = true;
         q('.demo-cpe tbody').innerHTML = '';
         q('.demo-ref').textContent = '';
         var ul = q('.demo-boost ul');
@@ -655,7 +861,7 @@
         if (!await wait(1200, token)) return;
 
         ctx.setStep(2);
-        if (!await type(q('.demo-input'), 'NT$' + fmt(C.quote), token)) return;
+        if (!await type(input, fmt(C.quote), token)) return;
         if (!await wait(500, token)) return;
         var cbody = q('.demo-cpe tbody');
         for (var c = 0; c < C.candidates.length; c++) {
@@ -663,6 +869,7 @@
           var price = cd.quote || C.quote;
           var cb = cd.key === 'E' ? base : cd.base;
           var ctr = h('tr', 'is-new');
+          ctr.dataset.key = cd.key;
           ctr.appendChild(h('td', null, T.cpe.name(cd.key)));
           ctr.appendChild(h('td', null, fmt(price)));
           if (cb) {
@@ -699,6 +906,133 @@
           ul.appendChild(h('li', 'is-new', picks[p]));
           if (!await wait(400, token)) return;
         }
+        input.disabled = false;
+        q('.demo-try').hidden = false;
+        return true;
+      }
+
+      return { reset: reset, run: run };
+    },
+
+    /* 議題聲量：定義議題（先講清楚 API 限制）→ 每日新貼文數 → 標出異常，並和活動前對照（另算扣掉異常日）。 */
+    topic: function (stage, T, C) {
+      function q(sel) { return stage.querySelector(sel); }
+      var LAST = C.daily.length - 1;
+      var DAYS = [0, 31, 28, 31, 30];
+      function date(idx) {
+        var m = C.start[0], d = C.start[1] + idx;
+        while (d > DAYS[m]) { d -= DAYS[m]; m++; }
+        return T.date(m, d);
+      }
+      function avg(arr) { return arr.reduce(function (a, b) { return a + b; }, 0) / arr.length; }
+
+      var ax = axes({ label: T.chart.label, xMax: LAST, yTicks: [0, 75, 150], xTicks: [] });
+      var step = ax.x(1) - ax.x(0);
+      var band = svg('rect', {
+        'class': 'band', x: ax.x(C.campaign[0]) - step / 2, y: 16,
+        width: ax.x(C.campaign[1]) - ax.x(C.campaign[0]) + step, height: 134
+      });
+      ax.el.insertBefore(band, ax.el.firstChild);
+      [0, 7, 14, 21, LAST].forEach(function (i) {
+        ax.el.appendChild(svg('text', { x: ax.x(i), y: 172, 'text-anchor': 'middle', 'class': 'axis' }, date(i)));
+      });
+      ax.el.appendChild(svg('g', { 'class': 'bars' }));
+      ax.el.appendChild(svg('g', { 'class': 'marks' }));
+
+      var grid = h('div', 'demo-grid');
+      var left = h('div', 'demo-col');
+      var right = h('div', 'demo-col');
+
+      var scope = panel(T.scope.title, 'demo-scope');
+      scope.appendChild(h('div', 'demo-url'));
+      scope.appendChild(h('dl'));
+      left.appendChild(scope);
+      var log = panel(T.log.title, 'demo-log');
+      log.appendChild(h('ul'));
+      left.appendChild(log);
+
+      var chart = panel(T.chart.label, 'demo-chart');
+      var legend = h('div', 'demo-legend');
+      legend.appendChild(h('span', 'is-band', T.chart.campaign));
+      legend.appendChild(h('span', 'is-mark', T.chart.collab));
+      chart.appendChild(legend);
+      chart.appendChild(ax.el);
+      right.appendChild(chart);
+      var sum = h('div', 'demo-panel demo-summary');
+      right.appendChild(sum);
+
+      grid.appendChild(left);
+      grid.appendChild(right);
+      stage.appendChild(grid);
+
+      function addLog(text, cls) {
+        var ul = q('.demo-log ul');
+        ul.appendChild(h('li', cls || null, text));
+        ul.scrollTop = ul.scrollHeight;
+      }
+
+      function reset() {
+        ctx.stamp(T.stamp.before);
+        q('.demo-url').textContent = '';
+        q('.demo-scope dl').innerHTML = '';
+        q('.demo-log ul').innerHTML = '';
+        q('.bars').innerHTML = '';
+        q('.marks').innerHTML = '';
+        band.style.display = 'none';
+        sum.innerHTML = '';
+        sum.hidden = true;
+      }
+
+      async function run(token) {
+        ctx.setStep(0);
+        if (!await type(q('.demo-url'), T.tags.join('  '), token)) return;
+        if (!await wait(400, token)) return;
+        var dl = q('.demo-scope dl');
+        for (var r = 0; r < T.scope.limits.length; r++) {
+          addRow(dl, T.scope.limits[r][0], T.scope.limits[r][1], r === 1 ? 'is-na' : null);
+          if (!await wait(r === 1 ? 1300 : 500, token)) return;
+        }
+        if (!await wait(600, token)) return;
+
+        ctx.setStep(1);
+        band.style.display = '';
+        var w = step * 0.68;
+        for (var i = 0; i <= LAST; i++) {
+          var v = C.daily[i];
+          ctx.stamp(T.stamp.running(date(i)));
+          q('.bars').appendChild(svg('rect', {
+            'class': 'bar' + (i === C.alertDay ? ' alert' : ''),
+            x: (ax.x(i) - w / 2).toFixed(1), y: ax.y(v).toFixed(1), width: w.toFixed(1), height: (150 - ax.y(v)).toFixed(1)
+          }));
+          if (C.collabs.indexOf(i) >= 0) {
+            q('.marks').appendChild(svg('line', { x1: ax.x(i), x2: ax.x(i), y1: 153, y2: 159, 'class': 'mark' }));
+          }
+          if (i === C.alertDay) {
+            ctx.setStep(2);
+            var prev = avg(C.daily.slice(i - 7, i));
+            addLog(T.log.alert(date(i), v, (v / prev).toFixed(1)), 'is-note');
+            addLog(T.log.same(date(i)), 'is-na');
+            if (!await wait(2400, token)) return;
+            ctx.setStep(1);
+          }
+          if (!await wait(130, token)) return;
+        }
+
+        ctx.setStep(2);
+        var pre = avg(C.daily.slice(0, C.campaign[0]));
+        var campDays = C.daily.slice(C.campaign[0], C.campaign[1] + 1);
+        var camp = avg(campDays);
+        var campX = avg(campDays.filter(function (v, k) { return C.campaign[0] + k !== C.alertDay; }));
+        function pct(a) { var p = Math.round((a / pre - 1) * 100); return (p >= 0 ? '+' : '') + p + '%'; }
+        sum.hidden = false;
+        sum.appendChild(h('div', 'demo-close-title', T.summary.title));
+        var sdl = h('dl');
+        T.summary.items({
+          pre: pre.toFixed(1), camp: camp.toFixed(1), up: pct(camp),
+          campX: campX.toFixed(1), upX: pct(campX), alert: date(C.alertDay)
+        }).forEach(function (it) { addRow(sdl, it[0], it[1]); });
+        sum.appendChild(sdl);
+        sum.appendChild(h('p', 'demo-ref', T.summary.caveat));
         return true;
       }
 
@@ -707,5 +1041,6 @@
   };
 
   buildShell();
-  select(D.order[0]);
+  if (!fromHash()) select(D.order[0]);
+  window.addEventListener('hashchange', fromHash);
 })();

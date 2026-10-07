@@ -354,6 +354,9 @@ h1 {
 .demo-quote { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--ink-muted); }
 .demo-quote .demo-input { flex: 0 0 9em; margin: 0; text-align: right; color: var(--ink); font-weight: 500; }
 .demo-ref { margin: 8px 0 0; font-size: 13px; color: var(--ink-muted); }
+.demo-panel dt { flex: none; white-space: nowrap; }
+.demo-scope dl div { display: grid; grid-template-columns: auto 1fr; gap: 12px; }
+.demo-scope dd { text-align: left; }
 .demo-panel dl div.is-na dd { color: var(--ink-absent); font-weight: 400; }
 .demo-alert p { margin: 0; }
 .demo-alert-hint { margin-top: 6px !important; font-size: 13px; color: var(--ink-muted); }
@@ -375,6 +378,33 @@ h1 {
 .demo-close-acts { display: flex; gap: 8px; margin-top: 10px; }
 .demo-fake-btn { font-size: 13px; border: 1px solid var(--rule-strong); border-radius: 4px; padding: 2px 12px; color: var(--ink-muted); }
 .demo-note { margin: 12px 0 0; font-size: 13px; color: var(--ink-absent); }
+/* 示範底部：說明文字＋這個情境的聯絡入口 */
+.demo-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 24px; flex-wrap: wrap; margin-top: 12px; }
+.demo-foot .demo-note { margin: 0; }
+.demo-cta { font-size: 14px; font-weight: 500; }
+/* 結案摘要的成本口徑切換 */
+.demo-seg { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; font-size: 13px; }
+.demo-seg-label { color: var(--ink-muted); margin-right: 4px; }
+.demo-seg-btn { font: inherit; font-size: 13px; padding: 2px 10px; border: 1px solid var(--rule-strong); border-radius: 4px; background: var(--sheet); color: var(--ink-muted); cursor: pointer; }
+.demo-seg-btn[aria-pressed="true"] { border-color: var(--report-teal); background: var(--teal-tint); color: var(--ink); font-weight: 500; }
+.demo-close dl { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+/* 選人的報價輸入框 */
+.demo-quote .demo-input { display: flex; align-items: center; gap: 2px; }
+.demo-quote input { width: 100%; min-width: 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: right; padding: 0; }
+.demo-quote input:disabled { color: inherit; opacity: 1; }
+.demo-quote input:not(:disabled) { border-bottom: 1px solid var(--report-teal); }
+.demo-try { font-size: 12px; color: var(--report-teal); text-align: right; margin: -4px 0 6px; }
+.demo-try[hidden] { display: none; }
+/* 公平比較：圖和表左右各半 */
+.demo-grid-wide { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+.demo-chart .node-line { stroke: var(--rule-strong); stroke-dasharray: 3 3; }
+.demo-chart .tag { font-size: 12px; font-weight: 700; fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-width: 3px; }
+/* 議題聲量：長條、活動期間底色 */
+.demo-chart .band { fill: var(--teal-tint); }
+.demo-chart .bar { fill: var(--rule-strong); }
+.demo-chart .bar.alert { fill: var(--ink); }
+.demo-legend .is-band::before { height: 10px; border-top: 0; background: var(--teal-tint); border: 1px solid var(--teal-band); }
+
 @keyframes demo-in { from { background: var(--teal-band); } to { background: transparent; } }
 .demo.is-playing .demo-log li:last-child,
 .demo.is-playing tr.is-new td,
@@ -550,4 +580,9 @@ h2 {
   .report th, .report td { padding-left: 4px; padding-right: 4px; }
   .report .col-base { display: none; }
   .report .flag-text { display: none; }
+  .demo { padding: 14px 12px; }
+  .demo-panel { padding: 10px; }
+  .demo-panel .flag-text { display: none; }
+  .demo-panel th, .demo-panel td { padding-left: 3px; padding-right: 3px; }
+  .demo-panel td:last-child { white-space: normal; }
 }
