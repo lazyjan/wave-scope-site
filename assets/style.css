@@ -562,6 +562,18 @@ h2 {
   .status { flex-direction: column; }
   .demo { padding: 16px; }
   .deliv + .deliv { margin-top: 32px; }
+  /* 分頁在窄螢幕排成一列、橫向捲動；左右延伸到示範框的邊緣，露出半個分頁提示還能往右滑。 */
+  .demo-tabs {
+    position: relative;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0 -16px 16px;
+    padding: 0 16px 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .demo-tabs::-webkit-scrollbar { display: none; }
+  .demo-tab { flex: none; white-space: nowrap; }
   .demo-grid { grid-template-columns: minmax(0, 1fr); }
   .demo-close dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .demo-status { flex-direction: column; gap: 2px; min-height: 6.4em; }
@@ -581,6 +593,7 @@ h2 {
   .report .col-base { display: none; }
   .report .flag-text { display: none; }
   .demo { padding: 14px 12px; }
+  .demo-tabs { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; }
   .demo-panel { padding: 10px; }
   .demo-panel .flag-text { display: none; }
   .demo-panel th, .demo-panel td { padding-left: 3px; padding-right: 3px; }

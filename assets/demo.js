@@ -213,6 +213,9 @@
       shell.tabs.querySelectorAll('.demo-tab').forEach(function (b) {
         b.setAttribute('aria-pressed', String(b.dataset.key === key));
       });
+      revealTab();
+      /* 字型載入後分頁會變寬，位置要重算一次（頁面 load 時也會再算，見檔尾）。 */
+      if (document.fonts) document.fonts.ready.then(revealTab);
     }
     shell.rail.innerHTML = '';
     T.steps.forEach(function (st, i) {
@@ -231,6 +234,17 @@
     }
     current = SCENARIOS[key](shell.stage, T, D[key]);
     start(true);
+  }
+
+  /** 窄螢幕分頁會橫向捲動：把選中的分頁捲進可見範圍（只動分頁列，不捲整頁）。 */
+  function revealTab() {
+    var tabs = shell.tabs;
+    var b = tabs && tabs.querySelector('[aria-pressed="true"]');
+    if (!b || tabs.scrollWidth <= tabs.clientWidth) return;
+    var pad = parseFloat(getComputedStyle(tabs).paddingLeft) || 0;
+    var left = b.offsetLeft - pad, right = b.offsetLeft + b.offsetWidth + pad - tabs.clientWidth;
+    if (tabs.scrollLeft > left) tabs.scrollLeft = left;
+    else if (tabs.scrollLeft < right) tabs.scrollLeft = right;
   }
 
   /** 網址是 #demo-<key> 時切到那個情境並捲到示範區；回傳是否有對應的情境。 */
@@ -1043,4 +1057,6 @@
   buildShell();
   if (!fromHash()) select(D.order[0]);
   window.addEventListener('hashchange', fromHash);
+  window.addEventListener('load', revealTab);
+  window.addEventListener('resize', revealTab);
 })();
